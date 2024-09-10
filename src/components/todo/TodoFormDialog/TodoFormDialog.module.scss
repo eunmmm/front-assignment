@@ -1,0 +1,28 @@
+.dialogContent {
+  position: relative;
+  min-width: 260px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.submitButton {
+  display: flex;
+  margin-left: auto;
+  margin-top: 20px;
+}
+
+.closeButton {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  padding: 10px;
+
+  img {
+    height: 32px;
+    object-fit: cover;
+  }
+}
