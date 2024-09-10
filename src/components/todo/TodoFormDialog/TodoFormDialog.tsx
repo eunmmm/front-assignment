@@ -6,17 +6,12 @@ import styles from './TodoFormDialog.module.scss';
 
 type TodoFormDialogProps = {
   isOpen: boolean;
-  onClose: () => void;
   mode: 'create' | 'update';
 };
 
-const TodoFormDialog = ({
-  isOpen,
-  onClose,
-  mode,
-}: TodoFormDialogProps): JSX.Element => {
+const TodoFormDialog = ({ isOpen, mode }: TodoFormDialogProps): JSX.Element => {
   return (
-    <Dialog isOpen={isOpen} onClose={onClose}>
+    <Dialog isOpen={isOpen}>
       <div className={styles.dialogContent}>
         <form className={styles.form}>
           <TodoForm
