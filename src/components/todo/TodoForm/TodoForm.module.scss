@@ -1,0 +1,29 @@
+.formTitle {
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  & + .formGroup {
+    margin-top: 20px;
+  }
+}
+
+.label {
+  font-weight: bold;
+}
+
+.input,
+.textarea {
+  padding: 10px;
+  border: 1px solid var(--gray);
+  border-radius: 4px;
+}
+
+.textarea {
+  min-height: 100px;
+}
