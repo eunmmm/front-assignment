@@ -1,0 +1,33 @@
+import styles from './Checkbox.module.scss';
+
+type CheckboxProps = {
+  label?: string;
+  defaultChecked?: boolean;
+  onChange?: (checked: boolean) => void;
+};
+
+const Checkbox = ({
+  label,
+  defaultChecked = false,
+  onChange,
+}: CheckboxProps): JSX.Element => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (onChange) {
+      onChange(event.target.checked);
+    }
+  };
+
+  return (
+    <label className={styles.checkboxWrapper}>
+      <input
+        type="checkbox"
+        defaultChecked={defaultChecked}
+        onChange={handleChange}
+        className={styles.checkbox}
+      />
+      {label && <span className={styles.text}>{label}</span>}
+    </label>
+  );
+};
+
+export default Checkbox;

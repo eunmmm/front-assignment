@@ -1,0 +1,16 @@
+.checkboxWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.text {
+  font-size: 2rem;
+  user-select: none;
+}
