@@ -52,11 +52,14 @@ pre {
   vertical-align: baseline;
 }
 
-html,
-body {
+html {
   height: 100%;
   font-size: 10px;
-  font-family: 'Pretendard';
+}
+
+body {
+  height: 100%;
+  font-size: 1.6rem;
 }
 
 article,
@@ -136,4 +139,11 @@ img {
   height: 1px;
   margin: -1px;
   overflow: hidden;
+}
+
+.container {
+  max-width: 1440px;
+  padding: 40px 20px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
