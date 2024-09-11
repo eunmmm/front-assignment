@@ -1,0 +1,16 @@
+{
+  "todos": [
+    {
+      "id": "1",
+      "title": "Todo 1",
+      "description": "첫번째 투두 입니다.",
+      "completed": false
+    },
+    {
+      "id": "2",
+      "title": "Todo 2",
+      "description": "두번째 투두 입니다.",
+      "completed": true
+    }
+  ]
+}
