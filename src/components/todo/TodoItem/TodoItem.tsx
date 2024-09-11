@@ -10,9 +10,10 @@ import styles from './TodoItem.module.scss';
 type TodoItemProps = {
   todo: Todo;
   onUpdate: (todo: Todo) => void;
+  onDelete: (id: string) => void;
 };
 
-const TodoItem = ({ todo, onUpdate }: TodoItemProps) => {
+const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
   return (
     <section className={styles.todoItem}>
       <div className={styles.todoContent}>
@@ -23,7 +24,11 @@ const TodoItem = ({ todo, onUpdate }: TodoItemProps) => {
       </div>
       <div className={styles.buttonGroup}>
         <Button text="update" theme="primary" onClick={() => onUpdate(todo)} />
-        <Button text="delete" theme="dangerous" />
+        <Button
+          text="delete"
+          theme="dangerous"
+          onClick={() => onDelete(todo.id)}
+        />
       </div>
     </section>
   );
