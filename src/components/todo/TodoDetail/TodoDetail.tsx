@@ -1,15 +1,14 @@
+'use client';
+
+import { Todo } from '@/types/todo';
+
 import Button from '@/components/ui/Button/Button';
 import Checkbox from '@/components/ui/Checkbox/Checkbox';
 
 import styles from './TodoDetail.module.scss';
 
 type TodoDetailProps = {
-  todo: {
-    id: string;
-    title: string;
-    description: string;
-    completed: boolean;
-  };
+  todo: Todo;
 };
 
 const TodoDetail = ({ todo }: TodoDetailProps) => {

@@ -1,24 +1,19 @@
-'use client';
+import { getTodo } from '@/lib/api';
 
 import TodoDetail from '@/components/todo/TodoDetail/TodoDetail';
 import AlertDialog from '@/components/todo/AlertDialog/AlertDialog';
 
-const TodoDetailPage = (): JSX.Element => {
-  const todo = {
-    id: '1',
-    title: 'Todo 1',
-    description: '첫번째 투두 입니다.',
-    completed: false,
-  };
+interface TodoDetailPageProps {
+  params: { id: string };
+}
+
+const TodoDetailPage = async ({ params }: TodoDetailPageProps) => {
+  const todo = await getTodo(params.id);
 
   return (
     <div className="container">
       <TodoDetail todo={todo} />
-      <AlertDialog
-        isOpen={false}
-        onClose={() => {}}
-        message="todo를 정말 삭제할까요?"
-      />
+      <AlertDialog isOpen={false} message="todo를 정말 삭제할까요?" />
     </div>
   );
 };
