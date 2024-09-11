@@ -11,13 +11,27 @@ type TodoItemProps = {
   todo: Todo;
   onUpdate: (todo: Todo) => void;
   onDelete: (id: string) => void;
+  onCheckboxChange: (todo: Todo, completed: boolean) => Promise<void>;
 };
 
-const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
+const TodoItem = ({
+  todo,
+  onUpdate,
+  onDelete,
+  onCheckboxChange,
+}: TodoItemProps) => {
+  const handleCheckboxChange = (checked: boolean) => {
+    onCheckboxChange(todo, checked);
+  };
+
   return (
     <section className={styles.todoItem}>
       <div className={styles.todoContent}>
-        <Checkbox label={todo.title} checked={todo.completed} />
+        <Checkbox
+          label={todo.title}
+          checked={todo.completed}
+          onChange={handleCheckboxChange}
+        />
         <Link href={`/todo-list/${todo.id}`}>
           <p className={styles.description}>{todo.description}</p>
         </Link>

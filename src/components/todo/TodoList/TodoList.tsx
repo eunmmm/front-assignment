@@ -6,9 +6,15 @@ interface TodoListProps {
   todos: Todo[];
   onUpdate: (todo: Todo) => void;
   onDelete: (id: string) => void;
+  onCheckboxChange: (todo: Todo, completed: boolean) => Promise<void>;
 }
 
-const TodoList = ({ todos, onUpdate, onDelete }: TodoListProps) => {
+const TodoList = ({
+  todos,
+  onUpdate,
+  onDelete,
+  onCheckboxChange,
+}: TodoListProps) => {
   return (
     <div>
       {todos.map((todo) => (
@@ -17,6 +23,7 @@ const TodoList = ({ todos, onUpdate, onDelete }: TodoListProps) => {
           todo={todo}
           onUpdate={onUpdate}
           onDelete={onDelete}
+          onCheckboxChange={onCheckboxChange}
         />
       ))}
     </div>

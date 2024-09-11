@@ -9,6 +9,7 @@ import AlertDialog from '@/components/todo/AlertDialog/AlertDialog';
 
 import { Todo } from '@/types/todo';
 import { handleDeleteTodo } from '@/app/todo-list/actions';
+import { updateTodo } from '@/lib/api';
 
 import styles from './TodoListPage.module.scss';
 
@@ -71,6 +72,17 @@ const TodoListClient = ({ initialTodos }: TodoListClientProps) => {
     setIsAlertOpen(false);
   };
 
+  const handleCheckboxChange = async (todo: Todo, completed: boolean) => {
+    const updatedTodo = { ...todo, completed };
+    await updateTodo(todo.id, updatedTodo);
+
+    setTodos((prevTodos) =>
+      prevTodos.map((todoItem) =>
+        todoItem.id === todo.id ? updatedTodo : todoItem,
+      ),
+    );
+  };
+
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setEditTodo(null);
@@ -89,6 +101,7 @@ const TodoListClient = ({ initialTodos }: TodoListClientProps) => {
           todos={todos}
           onUpdate={openUpdateDialog}
           onDelete={handleDelete}
+          onCheckboxChange={handleCheckboxChange}
         />
       </div>
       <TodoFormDialog

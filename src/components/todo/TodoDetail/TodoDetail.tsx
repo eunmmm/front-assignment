@@ -10,6 +10,7 @@ import AlertDialog from '@/components/todo/AlertDialog/AlertDialog';
 
 import { Todo } from '@/types/todo';
 import { handleDeleteTodo } from '@/app/todo-list/actions';
+import { updateTodo } from '@/lib/api';
 
 import styles from './TodoDetail.module.scss';
 
@@ -20,6 +21,8 @@ type TodoDetailProps = {
 const TodoDetail = ({ todo }: TodoDetailProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [completed, setCompleted] = useState(todo.completed);
+
   const router = useRouter();
 
   const handleUpdateSuccess = () => {
@@ -44,6 +47,12 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
     setIsAlertOpen(false);
   };
 
+  const handleCheckboxChange = async (checked: boolean) => {
+    const updatedTodo = { ...todo, completed: checked };
+    setCompleted(checked);
+    await updateTodo(todo.id, updatedTodo);
+  };
+
   return (
     <section className={styles.todoDetail}>
       {isEditing ? (
@@ -57,8 +66,8 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
           <div className={styles.header}>
             <Checkbox
               label={todo.title}
-              checked={todo.completed}
-              onChange={() => {}}
+              checked={completed}
+              onChange={handleCheckboxChange}
             />
             <div className={styles.buttonGroup}>
               <Button
