@@ -86,7 +86,7 @@ export async function updateTodo(
 }
 
 export async function deleteTodo(id: string): Promise<void> {
-  const res = await fetchWithErrorHandling(`${API_URL}/todos/${id}`, {
+  await fetchWithErrorHandling(`${API_URL}/todos/${id}`, {
     method: 'DELETE',
   });
 }

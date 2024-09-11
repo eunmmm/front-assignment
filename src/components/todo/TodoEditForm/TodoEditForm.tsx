@@ -5,6 +5,8 @@ import { useState } from 'react';
 import Button from '@/components/ui/Button/Button';
 import TodoForm from '@/components/todo/TodoForm/TodoForm';
 import AlertDialog from '@/components/todo/AlertDialog/AlertDialog';
+import Loading from '@/components/ui/Loading/Loading';
+import Toast from '@/components/ui/Toast/Toast';
 
 import { Todo } from '@/types/todo';
 import { validateTodoForm, submitTodoForm } from '@/lib/formHandlers';
@@ -22,6 +24,7 @@ const TodoEditForm = ({ todo, onCancel, onSuccess }: TodoEditFormProps) => {
   const [description, setDescription] = useState(todo.description);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,15 +35,23 @@ const TodoEditForm = ({ todo, onCancel, onSuccess }: TodoEditFormProps) => {
       return;
     }
 
-    submitTodoForm(
-      'update',
-      todo.id,
-      title,
-      description,
-      onSuccess,
-      setError,
-      onCancel,
-    );
+    setLoading(true);
+
+    try {
+      await submitTodoForm(
+        'update',
+        todo.id,
+        title,
+        description,
+        onSuccess,
+        setError,
+        onCancel,
+      );
+    } catch (error) {
+      setError('Todo 업데이트 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancelClick = () => {
@@ -60,29 +71,39 @@ const TodoEditForm = ({ todo, onCancel, onSuccess }: TodoEditFormProps) => {
     setIsAlertOpen(false);
   };
 
+  const handleToastClose = () => {
+    setError(null);
+  };
+
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <TodoForm
-          title={title}
-          description={description}
-          onTitleChange={setTitle}
-          onDescriptionChange={setDescription}
-          formTitle="Edit Todo"
-        />
-        {error && <p className={styles.error}>{error}</p>}
-        <div className={styles.buttonGroup}>
-          <Button text="Cancel" theme="dangerous" onClick={handleCancelClick} />
-          <Button text="Save" type="submit" theme="primary" />
-        </div>
-      </form>
-
+      {loading && <Loading />}
+      {!loading && (
+        <form onSubmit={handleSubmit}>
+          <TodoForm
+            title={title}
+            description={description}
+            onTitleChange={setTitle}
+            onDescriptionChange={setDescription}
+            formTitle="Edit Todo"
+          />
+          <div className={styles.buttonGroup}>
+            <Button
+              text="Cancel"
+              theme="dangerous"
+              onClick={handleCancelClick}
+            />
+            <Button text="Save" type="submit" theme="primary" />
+          </div>
+        </form>
+      )}
       <AlertDialog
         isOpen={isAlertOpen}
         message="변경사항이 있습니다. 수정을 취소할까요?"
         onClose={handleAlertClose}
         onConfirm={handleAlertConfirm}
       />
+      {error && <Toast message={error} onClose={handleToastClose} />}
     </>
   );
 };

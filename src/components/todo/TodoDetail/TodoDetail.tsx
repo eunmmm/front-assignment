@@ -7,6 +7,8 @@ import Button from '@/components/ui/Button/Button';
 import Checkbox from '@/components/ui/Checkbox/Checkbox';
 import TodoEditForm from '@/components/todo/TodoEditForm/TodoEditForm';
 import AlertDialog from '@/components/todo/AlertDialog/AlertDialog';
+import Loading from '@/components/ui/Loading/Loading';
+import Toast from '@/components/ui/Toast/Toast';
 
 import { Todo } from '@/types/todo';
 import { handleDeleteTodo } from '@/app/todo-list/actions';
@@ -22,6 +24,8 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [completed, setCompleted] = useState(todo.completed);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -38,9 +42,17 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
   };
 
   const handleDeleteConfirm = async () => {
-    await handleDeleteTodo(todo.id);
-    setIsAlertOpen(false);
-    router.push('/todo-list');
+    setLoading(true);
+
+    try {
+      await handleDeleteTodo(todo.id);
+      setIsAlertOpen(false);
+      router.push('/todo-list');
+    } catch (error) {
+      setError('Todo 삭제 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteCancel = () => {
@@ -48,9 +60,20 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
   };
 
   const handleCheckboxChange = async (checked: boolean) => {
-    const updatedTodo = { ...todo, completed: checked };
-    setCompleted(checked);
-    await updateTodo(todo.id, updatedTodo);
+    setLoading(true);
+    try {
+      const updatedTodo = { ...todo, completed: checked };
+      setCompleted(checked);
+      await updateTodo(todo.id, updatedTodo);
+    } catch (error) {
+      setError('Todo 업데이트 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToastClose = () => {
+    setError(null);
   };
 
   return (
@@ -63,22 +86,31 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
         />
       ) : (
         <>
-          <div className={styles.header}>
-            <Checkbox
-              label={todo.title}
-              checked={completed}
-              onChange={handleCheckboxChange}
-            />
-            <div className={styles.buttonGroup}>
-              <Button
-                text="update"
-                theme="primary"
-                onClick={() => setIsEditing(true)}
-              />
-              <Button text="delete" theme="dangerous" onClick={handleDelete} />
-            </div>
-          </div>
-          <p className={styles.description}>{todo.description}</p>
+          {loading && <Loading />}
+          {!loading && (
+            <>
+              <div className={styles.header}>
+                <Checkbox
+                  label={todo.title}
+                  checked={completed}
+                  onChange={handleCheckboxChange}
+                />
+                <div className={styles.buttonGroup}>
+                  <Button
+                    text="update"
+                    theme="primary"
+                    onClick={() => setIsEditing(true)}
+                  />
+                  <Button
+                    text="delete"
+                    theme="dangerous"
+                    onClick={handleDelete}
+                  />
+                </div>
+              </div>
+              <p className={styles.description}>{todo.description}</p>
+            </>
+          )}
         </>
       )}
       <AlertDialog
@@ -87,6 +119,7 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
       />
+      {error && <Toast message={error} onClose={handleToastClose} />}
     </section>
   );
 };

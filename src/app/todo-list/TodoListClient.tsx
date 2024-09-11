@@ -6,6 +6,8 @@ import TodoList from '@/components/todo/TodoList/TodoList';
 import Button from '@/components/ui/Button/Button';
 import TodoFormDialog from '@/components/todo/TodoFormDialog/TodoFormDialog';
 import AlertDialog from '@/components/todo/AlertDialog/AlertDialog';
+import Loading from '@/components/ui/Loading/Loading';
+import Toast from '@/components/ui/Toast/Toast';
 
 import { Todo } from '@/types/todo';
 import { handleDeleteTodo } from '@/app/todo-list/actions';
@@ -23,6 +25,8 @@ const TodoListClient = ({ initialTodos }: TodoListClientProps) => {
   const [editTodo, setEditTodo] = useState<Todo | null>(null);
   const [deleteTodoId, setDeleteTodoId] = useState<string | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const openCreateDialog = () => {
     setEditTodo(null);
@@ -56,14 +60,21 @@ const TodoListClient = ({ initialTodos }: TodoListClientProps) => {
 
   const handleDeleteConfirm = async () => {
     if (deleteTodoId) {
-      await handleDeleteTodo(deleteTodoId);
+      setLoading(true);
 
-      setTodos((prevTodos) =>
-        prevTodos.filter((todo) => todo.id !== deleteTodoId),
-      );
+      try {
+        await handleDeleteTodo(deleteTodoId);
 
-      setDeleteTodoId(null);
-      setIsAlertOpen(false);
+        setTodos((prevTodos) =>
+          prevTodos.filter((todo) => todo.id !== deleteTodoId),
+        );
+      } catch (error) {
+        setError('Todo 삭제 중 오류가 발생했습니다.');
+      } finally {
+        setDeleteTodoId(null);
+        setIsAlertOpen(false);
+        setLoading(false);
+      }
     }
   };
 
@@ -73,19 +84,31 @@ const TodoListClient = ({ initialTodos }: TodoListClientProps) => {
   };
 
   const handleCheckboxChange = async (todo: Todo, completed: boolean) => {
-    const updatedTodo = { ...todo, completed };
-    await updateTodo(todo.id, updatedTodo);
+    setLoading(true);
 
-    setTodos((prevTodos) =>
-      prevTodos.map((todoItem) =>
-        todoItem.id === todo.id ? updatedTodo : todoItem,
-      ),
-    );
+    try {
+      const updatedTodo = { ...todo, completed };
+      await updateTodo(todo.id, updatedTodo);
+
+      setTodos((prevTodos) =>
+        prevTodos.map((todoItem) =>
+          todoItem.id === todo.id ? updatedTodo : todoItem,
+        ),
+      );
+    } catch (error) {
+      setError('Todo 업데이트 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setEditTodo(null);
+  };
+
+  const handleToastClose = () => {
+    setError(null);
   };
 
   return (
@@ -97,12 +120,16 @@ const TodoListClient = ({ initialTodos }: TodoListClientProps) => {
         onClick={openCreateDialog}
       />
       <div className={styles.todoListWrapper}>
-        <TodoList
-          todos={todos}
-          onUpdate={openUpdateDialog}
-          onDelete={handleDelete}
-          onCheckboxChange={handleCheckboxChange}
-        />
+        {loading ? (
+          <Loading />
+        ) : (
+          <TodoList
+            todos={todos}
+            onUpdate={openUpdateDialog}
+            onDelete={handleDelete}
+            onCheckboxChange={handleCheckboxChange}
+          />
+        )}
       </div>
       <TodoFormDialog
         isOpen={isDialogOpen}
@@ -119,6 +146,7 @@ const TodoListClient = ({ initialTodos }: TodoListClientProps) => {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
       />
+      {error && <Toast message={error} onClose={handleToastClose} />}
     </>
   );
 };

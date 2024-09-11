@@ -6,6 +6,8 @@ import Dialog from '@/components/ui/Dialog/Dialog';
 import Button from '@/components/ui/Button/Button';
 import TodoForm from '@/components/todo/TodoForm/TodoForm';
 import AlertDialog from '@/components/todo/AlertDialog/AlertDialog';
+import Loading from '@/components/ui/Loading/Loading';
+import Toast from '@/components/ui/Toast/Toast';
 
 import { Todo } from '@/types/todo';
 import { validateTodoForm, submitTodoForm } from '@/lib/formHandlers';
@@ -35,6 +37,7 @@ const TodoFormDialog = ({
   const [description, setDescription] = useState(initialDescription);
   const [error, setError] = useState<string | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -58,15 +61,23 @@ const TodoFormDialog = ({
       return;
     }
 
-    submitTodoForm(
-      mode,
-      todoId,
-      title,
-      description,
-      onSuccess,
-      setError,
-      onClose,
-    );
+    setLoading(true);
+
+    try {
+      await submitTodoForm(
+        mode,
+        todoId,
+        title,
+        description,
+        onSuccess,
+        setError,
+        onClose,
+      );
+    } catch (error) {
+      setError('Todo 저장 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -89,34 +100,42 @@ const TodoFormDialog = ({
     onClose();
   };
 
+  const handleToastClose = () => {
+    setError(null);
+  };
+
   return (
     <>
       <Dialog isOpen={isOpen}>
         <div className={styles.dialogContent}>
-          {error && <p className={styles.error}>{error}</p>}
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <TodoForm
-              title={title}
-              description={description}
-              onTitleChange={setTitle}
-              onDescriptionChange={setDescription}
-              formTitle={mode === 'create' ? 'Create Todo' : 'Update Todo'}
-            />
-            <Button
-              text="Submit"
-              theme="primary"
-              size="medium"
-              type="submit"
-              className={styles.submitButton}
-            />
-          </form>
-          <button
-            type="button"
-            className={styles.closeButton}
-            onClick={handleClose}
-          >
-            <img src="/icon/icon-close.png" alt="Close" />
-          </button>
+          {loading && <Loading />}
+          {!loading && (
+            <>
+              <form onSubmit={handleSubmit} className={styles.form}>
+                <TodoForm
+                  title={title}
+                  description={description}
+                  onTitleChange={setTitle}
+                  onDescriptionChange={setDescription}
+                  formTitle={mode === 'create' ? 'Create Todo' : 'Update Todo'}
+                />
+                <Button
+                  text="Submit"
+                  theme="primary"
+                  size="medium"
+                  type="submit"
+                  className={styles.submitButton}
+                />
+              </form>
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={handleClose}
+              >
+                <img src="/icon/icon-close.png" alt="Close" />
+              </button>
+            </>
+          )}
         </div>
       </Dialog>
       <AlertDialog
@@ -125,6 +144,7 @@ const TodoFormDialog = ({
         onClose={handleAlertClose}
         onConfirm={handleAlertConfirm}
       />
+      {error && <Toast message={error} onClose={handleToastClose} />}
     </>
   );
 };
