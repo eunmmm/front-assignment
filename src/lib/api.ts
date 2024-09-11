@@ -84,3 +84,9 @@ export async function updateTodo(
     throw new Error('서버 응답을 처리하는 데 문제가 발생했습니다.');
   }
 }
+
+export async function deleteTodo(id: string): Promise<void> {
+  const res = await fetchWithErrorHandling(`${API_URL}/todos/${id}`, {
+    method: 'DELETE',
+  });
+}
