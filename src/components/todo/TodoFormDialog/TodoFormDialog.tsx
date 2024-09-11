@@ -5,10 +5,10 @@ import { useState, useEffect } from 'react';
 import Dialog from '@/components/ui/Dialog/Dialog';
 import Button from '@/components/ui/Button/Button';
 import TodoForm from '@/components/todo/TodoForm/TodoForm';
+import AlertDialog from '@/components/todo/AlertDialog/AlertDialog';
 
 import { Todo } from '@/types/todo';
-import { TodoSchema } from '@/lib/validations';
-import { handleCreateTodo } from '@/app/todo-list/actions';
+import { validateTodoForm, submitTodoForm } from '@/lib/formHandlers';
 
 import styles from './TodoFormDialog.module.scss';
 
@@ -19,6 +19,7 @@ type TodoFormDialogProps = {
   onSuccess: (todo: Todo) => void;
   initialTitle?: string;
   initialDescription?: string;
+  todoId?: string;
 };
 
 const TodoFormDialog = ({
@@ -28,10 +29,12 @@ const TodoFormDialog = ({
   onSuccess,
   initialTitle = '',
   initialDescription = '',
+  todoId,
 }: TodoFormDialogProps) => {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [error, setError] = useState<string | null>(null);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -47,49 +50,82 @@ const TodoFormDialog = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const validation = TodoSchema.safeParse({ title, description });
+    const errorMessage = validateTodoForm(title, description);
 
-    if (!validation.success) {
-      setError(validation.error.errors[0].message);
+    if (errorMessage) {
+      setError(errorMessage);
+
       return;
     }
 
-    const formData = new FormData(e.currentTarget);
-    const result = await handleCreateTodo(formData);
+    submitTodoForm(
+      mode,
+      todoId,
+      title,
+      description,
+      onSuccess,
+      setError,
+      onClose,
+    );
+  };
 
-    if (result.error) {
-      setError(result.error);
-    } else if (result.todo) {
-      onSuccess(result.todo);
+  const handleClose = () => {
+    if (
+      mode === 'update' &&
+      (title !== initialTitle || description !== initialDescription)
+    ) {
+      setIsAlertOpen(true);
+    } else {
       onClose();
     }
   };
 
+  const handleAlertClose = () => {
+    setIsAlertOpen(false);
+  };
+
+  const handleAlertConfirm = () => {
+    setIsAlertOpen(false);
+    onClose();
+  };
+
   return (
-    <Dialog isOpen={isOpen}>
-      <div className={styles.dialogContent}>
-        {error && <p className={styles.error}>{error}</p>}
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <TodoForm
-            title={title}
-            description={description}
-            onTitleChange={setTitle}
-            onDescriptionChange={setDescription}
-            formTitle={mode === 'create' ? 'Create Todo' : 'Update Todo'}
-          />
-          <Button
-            text="Submit"
-            theme="primary"
-            size="medium"
-            type="submit"
-            className={styles.submitButton}
-          />
-        </form>
-        <button type="button" className={styles.closeButton} onClick={onClose}>
-          <img src="/icon/icon-close.png" alt="Close" />
-        </button>
-      </div>
-    </Dialog>
+    <>
+      <Dialog isOpen={isOpen}>
+        <div className={styles.dialogContent}>
+          {error && <p className={styles.error}>{error}</p>}
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <TodoForm
+              title={title}
+              description={description}
+              onTitleChange={setTitle}
+              onDescriptionChange={setDescription}
+              formTitle={mode === 'create' ? 'Create Todo' : 'Update Todo'}
+            />
+            <Button
+              text="Submit"
+              theme="primary"
+              size="medium"
+              type="submit"
+              className={styles.submitButton}
+            />
+          </form>
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={handleClose}
+          >
+            <img src="/icon/icon-close.png" alt="Close" />
+          </button>
+        </div>
+      </Dialog>
+      <AlertDialog
+        isOpen={isAlertOpen}
+        message="변경사항이 있습니다. 수정을 취소할까요?"
+        onClose={handleAlertClose}
+        onConfirm={handleAlertConfirm}
+      />
+    </>
   );
 };
 
