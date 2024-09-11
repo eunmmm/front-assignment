@@ -9,7 +9,7 @@ type TodoFormDialogProps = {
   mode: 'create' | 'update';
 };
 
-const TodoFormDialog = ({ isOpen, mode }: TodoFormDialogProps): JSX.Element => {
+const TodoFormDialog = ({ isOpen, mode }: TodoFormDialogProps) => {
   return (
     <Dialog isOpen={isOpen}>
       <div className={styles.dialogContent}>

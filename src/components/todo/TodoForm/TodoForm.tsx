@@ -14,7 +14,7 @@ const TodoForm = ({
   description,
   onTitleChange,
   onDescriptionChange,
-}: TodoFormProps): JSX.Element => {
+}: TodoFormProps) => {
   return (
     <>
       <h2 className={styles.formTitle}>{formTitle}</h2>

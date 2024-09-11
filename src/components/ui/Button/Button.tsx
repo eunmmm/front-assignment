@@ -16,7 +16,7 @@ const Button = ({
   size = 'medium',
   type = 'button',
   className = '',
-}: ButtonProps): JSX.Element => {
+}: ButtonProps) => {
   return (
     <button
       type={type}

@@ -11,7 +11,7 @@ type TodoEditFormProps = {
   };
 };
 
-const TodoEditForm = ({ todo }: TodoEditFormProps): JSX.Element => {
+const TodoEditForm = ({ todo }: TodoEditFormProps) => {
   return (
     <form>
       <TodoForm

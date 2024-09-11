@@ -1,3 +1,5 @@
+'use client';
+
 import styles from './Checkbox.module.scss';
 
 type CheckboxProps = {
@@ -10,7 +12,7 @@ const Checkbox = ({
   label,
   defaultChecked = false,
   onChange,
-}: CheckboxProps): JSX.Element => {
+}: CheckboxProps) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (onChange) {
       onChange(event.target.checked);

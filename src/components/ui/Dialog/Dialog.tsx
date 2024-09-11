@@ -5,7 +5,7 @@ type DialogProps = {
   children: React.ReactNode;
 };
 
-const Dialog = ({ isOpen, children }: DialogProps): JSX.Element | null => {
+const Dialog = ({ isOpen, children }: DialogProps) => {
   if (!isOpen) return null;
 
   return (
