@@ -13,9 +13,9 @@ const Checkbox = ({
   defaultChecked = false,
   onChange,
 }: CheckboxProps) => {
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (onChange) {
-      onChange(event.target.checked);
+      onChange(e.target.checked);
     }
   };
 

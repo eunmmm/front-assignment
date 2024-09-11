@@ -42,6 +42,7 @@ const TodoForm = ({
           onChange={(e) => onDescriptionChange(e.target.value)}
           placeholder="Enter todo description"
           className={styles.textarea}
+          required
         />
       </div>
     </>

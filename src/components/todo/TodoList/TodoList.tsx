@@ -1,12 +1,12 @@
-import { Todo } from '@/types/todo';
-
 import TodoItem from '@/components/todo/TodoItem/TodoItem';
+
+import { Todo } from '@/types/todo';
 
 interface TodoListProps {
   todos: Todo[];
 }
 
-const TodoList = ({ todos }: TodoListProps): React.ReactNode => {
+const TodoList = ({ todos }: TodoListProps) => {
   return (
     <div>
       {todos.map((todo) => (

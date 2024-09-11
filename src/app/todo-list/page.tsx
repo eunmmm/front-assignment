@@ -1,7 +1,6 @@
-import { getTodos } from '@/lib/api';
+import TodoListClient from './TodoListClient';
 
-import TodoList from '@/components/todo/TodoList/TodoList';
-import Button from '@/components/ui/Button/Button';
+import { getTodos } from '@/lib/api';
 
 import styles from './TodoListPage.module.scss';
 
@@ -11,10 +10,7 @@ const TodoListPage = async () => {
   return (
     <div className="container">
       <h1 className={styles.title}>Todo List</h1>
-      <Button text="create" theme="primary" className={styles.createButton} />
-      <div className={styles.todoListWrapper}>
-        <TodoList todos={todos} />
-      </div>
+      <TodoListClient initialTodos={todos} />
     </div>
   );
 };
