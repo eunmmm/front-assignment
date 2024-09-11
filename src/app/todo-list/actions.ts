@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { Todo } from '@/types/todo';
 import { TodoSchema } from '@/lib/validations';
-import { createTodo, updateTodo } from '@/lib/api';
+import { createTodo, updateTodo, deleteTodo } from '@/lib/api';
 
 export async function handleCreateTodo(
   formData: FormData,
@@ -56,5 +56,21 @@ export async function handleUpdateTodo(
     }
 
     return { error: '할 일 수정을 실패했습니다. 다시 시도해 주세요.' };
+  }
+}
+
+export async function handleDeleteTodo(
+  id: string,
+): Promise<{ error?: string }> {
+  try {
+    await deleteTodo(id);
+
+    revalidatePath('/todo-list');
+
+    return {};
+  } catch (error) {
+    console.error('Error deleting todo:', error);
+
+    return { error: '할 일을 삭제하는 데 실패했습니다. 다시 시도해 주세요.' };
   }
 }
