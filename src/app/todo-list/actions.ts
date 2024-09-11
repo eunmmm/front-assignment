@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { Todo } from '@/types/todo';
 import { TodoSchema } from '@/lib/validations';
-import { createTodo } from '@/lib/api';
+import { createTodo, updateTodo } from '@/lib/api';
 
 export async function handleCreateTodo(
   formData: FormData,
@@ -29,5 +29,32 @@ export async function handleCreateTodo(
     }
 
     return { error: '할 일을 생성하는 데 실패했습니다. 다시 시도해 주세요.' };
+  }
+}
+
+export async function handleUpdateTodo(
+  id: string,
+  formData: FormData,
+): Promise<{ todo?: Todo; error?: string }> {
+  try {
+    const validatedData = TodoSchema.parse({
+      title: formData.get('title'),
+      description: formData.get('description'),
+    });
+
+    const completed = formData.get('completed') === 'true';
+    const updatedTodo = await updateTodo(id, { ...validatedData, completed });
+
+    revalidatePath('/todo-list');
+
+    return { todo: updatedTodo };
+  } catch (error) {
+    console.error('Error updating todo:', error);
+
+    if (error instanceof z.ZodError) {
+      return { error: error.errors[0].message };
+    }
+
+    return { error: '할 일 수정을 실패했습니다. 다시 시도해 주세요.' };
   }
 }
