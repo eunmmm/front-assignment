@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import Button from '@/components/ui/Button/Button';
@@ -18,38 +18,50 @@ import { validateTodoForm, submitTodoForm } from '@/lib/formHandlers';
 import styles from './TodoDetail.module.scss';
 
 type TodoDetailProps = {
-  todo: Todo;
+  todo: Todo | null;
 };
 
 const TodoDetail = ({ todo }: TodoDetailProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [completed, setCompleted] = useState(todo.completed);
+  const [completed, setCompleted] = useState(todo?.completed || false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
 
-  const handleOperation = async (
-    operation: 'delete' | 'update',
-    checked?: boolean,
-  ) => {
+  useEffect(() => {
+    if (!todo) {
+      router.push('/todo-list');
+    }
+  }, [todo, router]);
+
+  if (!todo) {
+    return null;
+  }
+
+  const handleDelete = async () => {
     setLoading(true);
+    setIsAlertOpen(false);
 
     try {
-      if (operation === 'delete') {
-        await handleDeleteTodo(todo.id);
-        setIsAlertOpen(false);
-        router.push('/todo-list');
-      } else if (operation === 'update' && checked !== undefined) {
-        const updatedTodo = { ...todo, completed: checked };
-        setCompleted(checked);
-        await updateTodo(todo.id, updatedTodo);
-      }
+      await handleDeleteTodo(todo.id);
+      router.push('/todo-list');
     } catch (error) {
-      setError(
-        `Todo ${operation === 'delete' ? '삭제' : '업데이트'} 중 오류가 발생했습니다.`,
-      );
+      setError('Todo 삭제 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdate = async (checked: boolean) => {
+    setLoading(true);
+    try {
+      const updatedTodo = { ...todo, completed: checked };
+      setCompleted(checked);
+      await updateTodo(todo.id, updatedTodo);
+    } catch (error) {
+      setError('Todo 업데이트 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -100,7 +112,7 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
                 <Checkbox
                   label={todo.title}
                   checked={completed}
-                  onChange={(checked) => handleOperation('update', checked)}
+                  onChange={(checked) => handleUpdate(checked)}
                 />
                 <div className={styles.buttonGroup}>
                   <Button
@@ -124,7 +136,7 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
         isOpen={isAlertOpen}
         message="정말 삭제하시겠습니까?"
         onClose={() => setIsAlertOpen(false)}
-        onConfirm={() => handleOperation('delete')}
+        onConfirm={handleDelete}
       />
       {error && <Toast message={error} onClose={() => setError(null)} />}
     </section>

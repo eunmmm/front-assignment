@@ -7,30 +7,32 @@ export async function getTodos(): Promise<Todo[]> {
     method: 'GET',
   });
 
-  try {
-    const todos: Todo[] = await res.json();
+  const todos: Todo[] = await res.json();
 
-    return todos;
-  } catch (error) {
-    console.error('응답을 JSON으로 변환하는 중 오류:', error);
-
-    throw new Error('서버 응답을 처리하는 데 문제가 발생했습니다.');
-  }
+  return todos;
 }
 
-export async function getTodo(id: string): Promise<Todo> {
-  const res = await fetchWithErrorHandling(`${API_URL}/todos/${id}`, {
-    method: 'GET',
-  });
-
+export async function getTodo(id: string): Promise<Todo | null> {
   try {
+    const res = await fetch(`${API_URL}/todos/${id}`, {
+      method: 'GET',
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        return null;
+      }
+
+      throw new Error(`요청이 실패했습니다. ${res.status}`);
+    }
+
     const todo: Todo = await res.json();
 
     return todo;
   } catch (error) {
-    console.error('응답을 JSON으로 변환하는 중 오류:', error);
+    console.error('Error in getTodo:', error);
 
-    throw new Error('서버 응답을 처리하는 데 문제가 발생했습니다.');
+    throw error;
   }
 }
 
@@ -47,15 +49,9 @@ export async function createTodo(data: {
     body: JSON.stringify(data),
   });
 
-  try {
-    const todo: Todo = await res.json();
+  const todo: Todo = await res.json();
 
-    return todo;
-  } catch (error) {
-    console.error('응답을 JSON으로 변환하는 중 오류:', error);
-
-    throw new Error('서버 응답을 처리하는 데 문제가 발생했습니다.');
-  }
+  return todo;
 }
 
 export async function updateTodo(
@@ -74,15 +70,9 @@ export async function updateTodo(
     body: JSON.stringify(data),
   });
 
-  try {
-    const todo: Todo = await res.json();
+  const todo: Todo = await res.json();
 
-    return todo;
-  } catch (error) {
-    console.error('응답을 JSON으로 변환하는 중 오류:', error);
-
-    throw new Error('서버 응답을 처리하는 데 문제가 발생했습니다.');
-  }
+  return todo;
 }
 
 export async function deleteTodo(id: string): Promise<void> {
