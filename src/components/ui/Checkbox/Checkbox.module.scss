@@ -1,3 +1,5 @@
+@use '@/styles/mixin' as mixin;
+
 .checkboxWrapper {
   display: inline-flex;
   align-items: center;
@@ -11,7 +13,11 @@
 }
 
 .text {
-  font-size: 2rem;
+  font-size: 1.8rem;
   word-break: break-all;
   user-select: none;
+
+  @include mixin.desktop {
+    font-size: 2rem;
+  }
 }
