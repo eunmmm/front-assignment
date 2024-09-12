@@ -12,7 +12,8 @@
     "prepare": "husky install",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "server": "json-server --watch db.json --port 3001"
   },
   "dependencies": {
     "json-server": "^1.0.0-beta.2",
