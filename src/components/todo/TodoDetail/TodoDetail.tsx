@@ -13,6 +13,7 @@ import Toast from '@/components/ui/Toast/Toast';
 import { Todo } from '@/types/todo';
 import { handleDeleteTodo } from '@/app/todo-list/actions';
 import { updateTodo } from '@/lib/api';
+import { validateTodoForm, submitTodoForm } from '@/lib/formHandlers';
 
 import styles from './TodoDetail.module.scss';
 
@@ -29,42 +30,52 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
 
   const router = useRouter();
 
-  const handleUpdateSuccess = () => {
-    setIsEditing(false);
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-  };
-
-  const handleDelete = () => {
-    setIsAlertOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
+  const handleOperation = async (
+    operation: 'delete' | 'update',
+    checked?: boolean,
+  ) => {
     setLoading(true);
 
     try {
-      await handleDeleteTodo(todo.id);
-      setIsAlertOpen(false);
-      router.push('/todo-list');
+      if (operation === 'delete') {
+        await handleDeleteTodo(todo.id);
+        setIsAlertOpen(false);
+        router.push('/todo-list');
+      } else if (operation === 'update' && checked !== undefined) {
+        const updatedTodo = { ...todo, completed: checked };
+        setCompleted(checked);
+        await updateTodo(todo.id, updatedTodo);
+      }
     } catch (error) {
-      setError('Todo 삭제 중 오류가 발생했습니다.');
+      setError(
+        `Todo ${operation === 'delete' ? '삭제' : '업데이트'} 중 오류가 발생했습니다.`,
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteCancel = () => {
-    setIsAlertOpen(false);
-  };
+  const handleSubmit = async (title: string, description: string) => {
+    const errorMessage = validateTodoForm(title, description);
+    if (errorMessage) {
+      setError(errorMessage);
+      return;
+    }
 
-  const handleCheckboxChange = async (checked: boolean) => {
     setLoading(true);
+
     try {
-      const updatedTodo = { ...todo, completed: checked };
-      setCompleted(checked);
-      await updateTodo(todo.id, updatedTodo);
+      await submitTodoForm(
+        'update',
+        todo.id,
+        title,
+        description,
+        () => {
+          setIsEditing(false);
+        },
+        setError,
+        () => setIsEditing(false),
+      );
     } catch (error) {
       setError('Todo 업데이트 중 오류가 발생했습니다.');
     } finally {
@@ -72,17 +83,13 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
     }
   };
 
-  const handleToastClose = () => {
-    setError(null);
-  };
-
   return (
     <section className={styles.todoDetail}>
       {isEditing ? (
         <TodoEditForm
           todo={todo}
-          onCancel={handleCancelEdit}
-          onSuccess={handleUpdateSuccess}
+          onCancel={() => setIsEditing(false)}
+          onSubmit={handleSubmit}
         />
       ) : (
         <>
@@ -93,7 +100,7 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
                 <Checkbox
                   label={todo.title}
                   checked={completed}
-                  onChange={handleCheckboxChange}
+                  onChange={(checked) => handleOperation('update', checked)}
                 />
                 <div className={styles.buttonGroup}>
                   <Button
@@ -104,7 +111,7 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
                   <Button
                     text="delete"
                     theme="dangerous"
-                    onClick={handleDelete}
+                    onClick={() => setIsAlertOpen(true)}
                   />
                 </div>
               </div>
@@ -116,10 +123,10 @@ const TodoDetail = ({ todo }: TodoDetailProps) => {
       <AlertDialog
         isOpen={isAlertOpen}
         message="정말 삭제하시겠습니까?"
-        onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
+        onClose={() => setIsAlertOpen(false)}
+        onConfirm={() => handleOperation('delete')}
       />
-      {error && <Toast message={error} onClose={handleToastClose} />}
+      {error && <Toast message={error} onClose={() => setError(null)} />}
     </section>
   );
 };

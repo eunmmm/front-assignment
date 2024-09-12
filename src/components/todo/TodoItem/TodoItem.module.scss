@@ -1,24 +1,37 @@
+@use '@/styles/mixin' as mixin;
+
 .todoItem {
   position: relative;
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   background-color: rgba(0, 184, 148, 0.1);
   box-sizing: border-box;
 
   & + .todoItem {
-    margin-top: 10px;
+    margin-top: 12px;
+  }
+
+  @include mixin.desktop {
+    max-width: 700px;
+    padding: 16px;
+    margin: 0 auto;
   }
 }
 
 .buttonGroup {
   display: flex;
   justify-content: end;
-  gap: 6px;
-  margin-top: 20px;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .description {
   margin-top: 20px;
-  padding-top: 20px;
+  padding-top: 10px;
   border-top: 1px solid var(--primary);
+  font-size: 1.4rem;
+
+  @include mixin.desktop {
+    font-size: 1.6rem;
+  }
 }

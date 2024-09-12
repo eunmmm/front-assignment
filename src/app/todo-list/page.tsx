@@ -1,5 +1,5 @@
-import TodoListClient from './TodoListClient';
 import ThemeToggleButton from '@/components/ui/ThemeToggleButton/ThemeToggleButton';
+import TodoListContent from '@/components/todo/TodoListContent/TodoListContent';
 
 import { getTodos } from '@/lib/api';
 
@@ -12,7 +12,7 @@ const TodoListPage = async () => {
     <div className="container">
       <h1 className={styles.title}>Todo List</h1>
       <ThemeToggleButton />
-      <TodoListClient initialTodos={todos} />
+      <TodoListContent initialTodos={todos} />
     </div>
   );
 };
