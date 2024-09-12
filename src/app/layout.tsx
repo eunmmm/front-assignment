@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import ThemeProviderWrapper from '@/contexts/ThemeProviderWrapper';
+
 import '../styles/globals.scss';
 import '../styles/variables.scss';
 
@@ -15,7 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+      </body>
     </html>
   );
 }

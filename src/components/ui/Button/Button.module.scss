@@ -7,12 +7,12 @@
 
   &.primary {
     background-color: var(--primary);
-    color: var(--white);
+    color: var(--text-color);
   }
 
   &.dangerous {
     background-color: var(--red);
-    color: var(--white);
+    color: var(--text-color);
   }
 
   &.small {

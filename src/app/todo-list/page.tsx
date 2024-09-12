@@ -1,4 +1,5 @@
 import TodoListClient from './TodoListClient';
+import ThemeToggleButton from '@/components/ui/ThemeToggleButton/ThemeToggleButton';
 
 import { getTodos } from '@/lib/api';
 
@@ -10,6 +11,7 @@ const TodoListPage = async () => {
   return (
     <div className="container">
       <h1 className={styles.title}>Todo List</h1>
+      <ThemeToggleButton />
       <TodoListClient initialTodos={todos} />
     </div>
   );

@@ -4,4 +4,13 @@
   --primary: #00b894;
   --red: #d63031;
   --gray: #cccccc;
+  --background: var(--white);
+  --text-color: var(--black);
+  --button-bg: #ccc;
+}
+
+[data-theme='dark'] {
+  --background: var(--black);
+  --text-color: var(--white);
+  --button-bg: #555;
 }
